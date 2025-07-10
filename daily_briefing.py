@@ -1,8 +1,10 @@
 import os, time, requests, smtplib
 from dotenv import load_dotenv
-from slack_sdk import WebClient
+# from slack_sdk import WebClient
 from email.message import EmailMessage
-from langchain.llms import GoogleGemini
+from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain_community.llms import GoogleGemini
+from langchain import HuggingFaceHub
 from langchain.tools import DuckDuckGoSearchRun
 from langchain.agents import initialize_agent, Tool
 import schedule
@@ -10,13 +12,19 @@ import schedule
 # ——— Load config ———
 load_dotenv()
 API_KEY    = os.getenv("GOOGLE_API_KEY")
-SLACK_WEB  = os.getenv("SLACK_WEBHOOK_URL")
+# SLACK_WEB  = os.getenv("SLACK_WEBHOOK_URL")
 SMTP_SRV   = os.getenv("EMAIL_SMTP_SERVER")
 EMAIL_ADDR = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASS = os.getenv("EMAIL_PASSWORD")
+HF_TOKEN = os.getenv("HF_TOKEN")
 
 # ——— LLM & Tools ———
-llm = GoogleGemini(api_key=API_KEY, model="gemini-1.5-pro")
+# llm = ChatGoogleGenerativeAI(api_key=API_KEY, model="gemini-1.5-pro")
+llm = HuggingFaceHub(
+    repo_id="meta-llama/Llama-2-7b-chat-hf",      # or any chat‐tuned Llama
+    model_kwargs={"temperature":0.7, "max_length":512},
+    huggingfacehub_api_token=HF_TOKEN
+)
 search_tool = DuckDuckGoSearchRun()
 tools = [
     Tool(name="fetch_headlines", func=search_tool.run,
@@ -29,6 +37,7 @@ agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbos
 def run_briefing():
     # 1) Fetch & summarize
     raw = agent.run("fetch_headlines: top news today")
+    time.sleep(60)
     summary = llm(f"Here are today’s headlines:\n{raw}\n\nWrite a concise, 3-bullet summary.")
     # 2) Fact-check each bullet
     results = []
@@ -41,8 +50,8 @@ def run_briefing():
     # 3) Build full message
     full = "📰 *Daily Briefing* 📰\n\n" + summary + "\n\n🔍 *Fact-Check Results:*\n" + "\n\n".join(results)
     # 4) Send to Slack
-    if SLACK_WEB:
-        requests.post(SLACK_WEB, json={"text": full})
+    # if SLACK_WEB:
+    #     requests.post(SLACK_WEB, json={"text": full})
     # 5) Send Email
     if SMTP_SRV and EMAIL_ADDR and EMAIL_PASS:
         msg = EmailMessage()
@@ -56,7 +65,7 @@ if __name__ == "__main__":
     # Run once immediately
     run_briefing()
     # —OR— keep the script alive and schedule daily at 08:00
-    schedule.every().day.at("08:00").do(run_briefing)
-    while True:
-        schedule.run_pending()
-        time.sleep(30)
+    # schedule.every().day.at("08:00").do(run_briefing)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(30)

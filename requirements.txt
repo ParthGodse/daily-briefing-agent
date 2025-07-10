@@ -3,3 +3,7 @@ duckduckgo-search
 python-dotenv
 schedule
 slack-sdk
+langchain-community
+requests
+schedule
+langchain-google-genai
