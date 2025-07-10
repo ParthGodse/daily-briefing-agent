@@ -1,0 +1,5 @@
+langchain
+duckduckgo-search
+python-dotenv
+schedule
+slack-sdk
