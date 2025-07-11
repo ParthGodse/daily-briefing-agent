@@ -87,9 +87,9 @@ def run_briefing():
 
 if __name__ == "__main__":
     #To run immediately:
-    # run_briefing()
+    run_briefing()
     #To schedule daily:
-    schedule.every().day.at("08:00").do(run_briefing)
-    while True:
-        schedule.run_pending()
+    # schedule.every().day.at("08:00").do(run_briefing)
+    # while True:
+    #     schedule.run_pending()
         # time.sleep(30)

@@ -3,7 +3,7 @@ name: Daily News Briefing
 on:
   schedule:
     # Runs every day at 08:00 Eastern (12:00 UTC)
-    - cron: '0 12 * * *'
+    - cron: '03 9 * * *'
   workflow_dispatch:  # allows you to trigger it manually
 
 jobs:
