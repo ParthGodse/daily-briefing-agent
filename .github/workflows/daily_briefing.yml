@@ -3,7 +3,7 @@ name: Daily News Briefing
 on:
   schedule:
     # Runs every day at 08:00 Eastern (12:00 UTC)
-    - cron: '03 9 * * *'
+    - cron: '30 9 * * *'
   workflow_dispatch:  # allows you to trigger it manually
 
 jobs:
@@ -22,6 +22,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
 
       - name: Run Daily Briefing
         env:
