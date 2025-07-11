@@ -1,13 +1,8 @@
-#!/usr/bin/env python3
 import os
 import smtplib
 from dotenv import load_dotenv
 from email.message import EmailMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-# try:
-#     from langchain.utilities import NewsAPIWrapper
-# except ImportError:
-#     from langchain.utilities.news_api import NewsAPIWrapper
 from newsapi import NewsApiClient
 from langchain_community.tools import DuckDuckGoSearchRun
 from langchain.agents import initialize_agent, Tool
@@ -20,19 +15,19 @@ SMTP_SRV     = os.getenv("EMAIL_SMTP_SERVER")
 EMAIL_ADDR   = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASS   = os.getenv("EMAIL_PASSWORD")
 
-# ——— 2) Initialize NewsAPI for real headlines ———
+#Initialize NewsAPI for real headlines
 news = NewsApiClient(api_key=NEWS_API_KEY)
 
-# ——— 3) Initialize search tool for fact-checking ———
+#Initialize search tool for fact-checking 
 search_tool = DuckDuckGoSearchRun()
 
-# ——— 4) Initialize Gemini LLM ———
+#Initialize Gemini LLM
 llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-pro",
     google_api_key=API_KEY
 )
 
-# ——— 5) Build an agent for fact-checking ———
+#fact-checking agent
 tools = [
     Tool(
         name="fact_check",
@@ -48,9 +43,7 @@ agent = initialize_agent(
 )
 
 def make_prompt(raw: str, n: int) -> str:
-    # dynamic summary placeholders
     summary_fmt = "\n".join("- …" for _ in range(n))
-    # dynamic fact-check placeholders
     fact_fmt = "\n".join(f"{i+1}. …: True/False/Unverified (url)" for i in range(n))
     return (
         f"Here are today’s top {n} headlines:\n\n"
@@ -69,15 +62,10 @@ def run_briefing():
     # fetch top headlines
     top_headlines = news.get_top_headlines(country="us", page_size=5)
     articles = top_headlines.get("articles", [])
-    # build raw numbered list
     raw = "\n".join(f"{i+1}. {a['title']}" for i, a in enumerate(articles))
-    n = len(articles)  # determine bullet count dynamically
+    n = len(articles)
 
-    # build dynamic prompt
     prompt = make_prompt(raw, n)
-
-    # (optional) throttle
-    # time.sleep(60)
 
     # single Gemini call
     resp = llm.invoke(prompt)
