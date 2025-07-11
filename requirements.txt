@@ -7,3 +7,9 @@ langchain-community
 requests
 schedule
 langchain-google-genai
+transformers
+torch
+accelerate
+einops
+xformers
+newsapi-python
