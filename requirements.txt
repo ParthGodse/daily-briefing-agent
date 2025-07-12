@@ -8,3 +8,4 @@ requests
 schedule
 langchain-google-genai
 newsapi-python
+judgeval
