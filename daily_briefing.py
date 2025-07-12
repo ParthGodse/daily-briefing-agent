@@ -16,10 +16,31 @@ from judgeval.integrations.langgraph import JudgevalCallbackHandler
 from judgeval.scorers import AnswerRelevancyScorer, FaithfulnessScorer
 
 load_dotenv()
-judgment = Tracer(
-    project_name="daily_briefing_agent",
-    api_key=os.getenv("JUDGMENT_API_KEY")
-)
+JUDGMENT_API_KEY = os.getenv("JUDGMENT_API_KEY")
+if JUDGMENT_API_KEY:
+    from judgeval.common.tracer import Tracer
+    from judgeval.integrations.langgraph import JudgevalCallbackHandler
+
+    judgment = Tracer(
+        project_name="daily_briefing_agent",
+        api_key=JUDGMENT_API_KEY
+    )
+    handler = JudgevalCallbackHandler(judgment)
+else:
+    # no-op stand-in so the rest of your code can still call handler.executed_* etc.
+    class _NoopHandler:
+        executed_nodes = []
+        executed_tools = []
+        executed_node_tools = []
+    handler = _NoopHandler()
+    # if you also use judgment.async_evaluate(), you can stub that too:
+    class _NoopTracer:
+        def observe(self, *args, **kwargs):
+            def decorator(fn): return fn
+            return decorator
+        def async_evaluate(self, *args, **kwargs): pass
+    judgment = _NoopTracer()
+
 handler = JudgevalCallbackHandler(judgment)
 
 API_KEY      = os.getenv("GOOGLE_API_KEY")
