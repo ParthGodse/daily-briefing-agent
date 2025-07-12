@@ -2,19 +2,13 @@
 
 This project is a fully-automated “Daily News Briefing” agent that:
 
-Fetches the top headlines (via NewsAPI).
-
-Summarizes them into N concise bullets using Google’s Gemini LLM.
-
-Fact-checks each bullet (via DuckDuckGo + Gemini prompts).
-
-Evaluates summary relevancy and fact-check faithfulness automatically with Judgeval scorers.
-
-Traces every step (node invocations, tool calls, evaluations) in a LangGraph workflow, surfaced in Judgeval’s dashboard.
-
-Re-stitches any multi-line bullets into single items so you always get exactly N checks.
-
-Formats the final briefing as Markdown, emails it via SMTP, and prints the result along with the trace metadata (executed_nodes, executed_tools, node→tool flow).
+## 1. Fetches the top headlines (via NewsAPI).
+## 2. Summarizes them into N concise bullets using Google’s Gemini LLM.
+## 3. Fact-checks each bullet (via DuckDuckGo + Gemini prompts).
+## 4. Evaluates summary relevancy and fact-check faithfulness automatically with Judgeval scorers.
+## 5. Traces every step (node invocations, tool calls, evaluations) in a LangGraph workflow, surfaced in Judgeval’s dashboard.
+## 6. Re-stitches any multi-line bullets into single items so you always get exactly N checks.
+## 7. Formats the final briefing as Markdown, emails it via SMTP, and prints the result along with the trace metadata (executed_nodes, executed_tools, node→tool flow).
 
 All configuration—API keys, email creds, scheduling—is driven by environment variables and can run locally, in GitHub Actions, or any server. The architecture cleanly separates data sources, LLM logic, orchestration (LangGraph), observability (Judgeval), and delivery (email), making it easy to extend or swap out components.
 
