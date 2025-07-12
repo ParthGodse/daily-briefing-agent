@@ -45,7 +45,7 @@ agent = initialize_agent(
     verbose=False
 )
 
-@judgment.observe(span_type="function")
+# @judgment.observe(span_type="function")
 def make_prompt(raw: str, n: int) -> str:
     summary_fmt = "\n".join("- …" for _ in range(n))
     fact_fmt = "\n".join(f"{i+1}. …: True/False/Unverified (url)" for i in range(n))
@@ -62,7 +62,7 @@ def make_prompt(raw: str, n: int) -> str:
         f"{fact_fmt}\n"
     )
 
-@judgment.observe(span_type="function")
+# @judgment.observe(span_type="function")
 def run_briefing():
     # fetch top headlines
     top_headlines = news.get_top_headlines(country="us", page_size=5)
